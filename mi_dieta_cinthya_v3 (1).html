@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi Dieta">
+<title>Mi Dieta · Cinthya</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#111110;--g1:#1c1c1a;--g2:#3a3a37;--g3:#6b6b67;--g4:#9a9a94;
+  --g5:#d4d4cc;--g6:#e8e8e3;--g7:#f4f4f0;--g8:#fafaf8;--white:#fff;
+  --green:#1a6b50;--green-l:#e8f4ef;--green-m:#2d9e75;
+  --amber:#c97c1a;--amber-l:#fdf3e3;
+  --red:#c0392b;--red-l:#fdecea;
+  --blue:#2563a8;--blue-l:#eaf1fb;
+  --r:16px;--rs:10px;--rx:7px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{background:var(--g7);font-family:'DM Sans',sans-serif;color:var(--black);min-height:100vh;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;background:var(--white);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 32px;text-align:center}
+#splash.hidden{display:none}
+.sp-eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--g4);margin-bottom:12px}
+.sp-name{font-family:'Fraunces',serif;font-size:48px;font-weight:300;color:var(--black);line-height:1;margin-bottom:4px}
+.sp-name em{font-style:italic;color:var(--green)}
+.sp-week{font-size:12px;color:var(--g4);margin-bottom:8px}
+.sp-streak{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:32px}
+.sp-streak-fire{font-size:20px}
+.sp-streak-txt{font-size:13px;font-weight:500;color:var(--black)}
+.sp-line{width:28px;height:1px;background:var(--g5);margin:0 auto 24px}
+.sp-tip{font-family:'Fraunces',serif;font-style:italic;font-size:17px;color:var(--g2);line-height:1.6;margin-bottom:40px;max-width:260px}
+.sp-btn{background:var(--black);color:var(--white);border:none;padding:14px 40px;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;width:100%;max-width:280px}
+.sp-btn:active{opacity:.85}
+
+/* ── HEADER ── */
+.header{background:var(--white);border-bottom:1px solid var(--g6);padding:env(safe-area-inset-top,44px) 16px 0;position:sticky;top:0;z-index:100}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px}
+.h-left{}
+.h-appname{font-family:'Fraunces',serif;font-size:18px;font-weight:300;line-height:1}
+.h-appname em{font-style:italic;color:var(--green)}
+.h-username{font-size:11px;color:var(--g4);margin-top:1px}
+.h-right{text-align:right}
+.h-day{font-size:13px;font-weight:500;color:var(--black)}
+.h-date{font-size:11px;color:var(--g4)}
+.h-week{font-size:10px;color:var(--g4);margin-top:1px}
+
+/* ── DAY STRIP ── */
+.day-strip{display:flex;gap:4px;overflow-x:auto;padding:8px 0 10px;scrollbar-width:none}
+.day-strip::-webkit-scrollbar{display:none}
+.day-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 12px;border-radius:999px;border:1px solid var(--g6);background:var(--g8);cursor:pointer;font-family:'DM Sans',sans-serif}
+.day-btn .dn{font-size:11px;color:var(--g3)}
+.day-btn .dd{font-size:14px;font-weight:500;color:var(--black)}
+.day-btn.active{background:var(--black);border-color:var(--black)}
+.day-btn.active .dn,.day-btn.active .dd{color:var(--white)}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--g6);display:flex;padding:6px 0 calc(env(safe-area-inset-bottom,0px)+6px);z-index:100}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px 0;color:var(--g4);font-family:'DM Sans',sans-serif;font-size:10px}
+.nb.active{color:var(--green)}
+.nb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── CONTENT ── */
+.content{padding:14px 14px calc(env(safe-area-inset-bottom,0px)+80px)}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── MACRO HERO ── */
+.macro-hero{background:var(--black);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.mh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.mh-label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.mh-day{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:rgba(255,255,255,.6);font-style:italic}
+.mh-warn{font-size:18px}
+.mh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mh-cell{text-align:center}
+.mh-val{font-size:18px;font-weight:500;color:var(--white)}
+.mh-lbl{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+.mh-track{height:2px;background:rgba(255,255,255,.1);border-radius:999px;margin-top:12px;display:flex;gap:2px;overflow:hidden}
+.tr-p{background:#2d9e75;border-radius:999px}
+.tr-c{background:#f0a832;border-radius:999px}
+.tr-f{background:#e06844;border-radius:999px}
+
+/* ── VITALS BAR ── */
+.vitals-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.vb-card{background:var(--white);border-radius:var(--rs);border:1px solid var(--g6);padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.vb-icon-row{display:flex;align-items:center;justify-content:space-between}
+.vb-icon{font-size:16px}
+.vb-edit{font-size:11px;color:var(--green);cursor:pointer;font-weight:500}
+.vb-val{font-size:17px;font-weight:500;color:var(--black)}
+.vb-lbl{font-size:10px;color:var(--g4)}
+
+/* ── SECTION TITLE ── */
+.stitle{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);font-weight:500;margin:16px 0 8px}
+
+/* ── INGREDIENTS CARD ── */
+.ing-card{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);overflow:hidden;margin-bottom:12px}
+.ing-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.ing-hdr-l{display:flex;align-items:center;gap:10px}
+.ing-ico{width:30px;height:30px;border-radius:8px;background:var(--amber-l);display:flex;align-items:center;justify-content:center;font-size:15px}
+.ing-ttl{font-size:14px;font-weight:500}
+.ing-sub{font-size:11px;color:var(--g4);margin-top:1px}
+.ing-arr{font-size:14px;color:var(--g4)}
+.ing-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.ing-body.open{max-height:2000px}
+.ing-inner{padding:6px 14px 12px}
+.ing-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--g6)}
+.ing-row:last-child{border-bottom:none}
+.ing-n{font-size:13px}
+.ing-q{font-size:11px;font-weight:500;color:var(--g3);background:var(--g7);padding:2px 8px;border-radius:999px}
+
+/* ── MEAL CARDS ── */
+.meal-card{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);overflow:hidden;margin-bottom:10px}
+.meal-photo-wrap{position:relative}
+.meal-photo{width:100%;height:170px;object-fit:cover;display:block;background:var(--g6)}
+.meal-fallback{width:100%;height:170px;background:var(--g6);display:none;align-items:center;justify-content:center;font-size:38px}
+.meal-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);color:var(--white);font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px}
+.meal-kcal-tag{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:var(--black);font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px}
+.meal-pname{padding:12px 14px 4px;font-family:'Fraunces',serif;font-size:17px;font-weight:400;line-height:1.3}
+.meal-items{padding:2px 0}
+.food-row{display:flex;justify-content:space-between;align-items:center;padding:7px 14px}
+.food-row+.food-row{border-top:1px solid var(--g6)}
+.food-l{flex:1}
+.food-n{font-size:13px}
+.food-m{font-size:10px;color:var(--g4);margin-top:1px}
+.food-r{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px}
+.qty-ctrl{display:flex;align-items:center;gap:4px}
+.qty-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--g5);background:var(--white);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--black);line-height:1}
+.qty-btn:active{background:var(--g6)}
+.qty-val{font-size:12px;font-weight:500;color:var(--g2);min-width:36px;text-align:center}
+.meal-foot{display:flex;padding:8px 14px;gap:6px;border-top:1px solid var(--g6);background:var(--g8)}
+.mfp{flex:1;text-align:center}
+.mfv{font-size:13px;font-weight:500}
+.mfl{font-size:9px;color:var(--g4);text-transform:uppercase;letter-spacing:.05em}
+
+/* ── SHARE BTN ── */
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:999px;border:1.5px solid var(--g5);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--black);cursor:pointer;margin-top:4px}
+.share-btn:active{background:var(--g7)}
+.share-icon{width:18px;height:18px}
+
+/* ── WEEKLY SCREEN ── */
+.wk-card{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);padding:14px;margin-bottom:12px}
+.wk-ttl{font-family:'Fraunces',serif;font-size:20px;margin-bottom:14px}
+.wk-table{width:100%;border-collapse:collapse;font-size:12px}
+.wk-table th{text-align:left;color:var(--g4);font-weight:400;font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:0 4px 8px}
+.wk-table th:first-child{padding-left:0}
+.wk-table td{padding:7px 4px;border-top:1px solid var(--g6);color:var(--black);font-size:12px}
+.wk-table td:first-child{padding-left:0;font-weight:500}
+.wk-table tr.tr-today td{background:var(--green-l)}
+.wk-avg{margin-top:12px;padding-top:12px;border-top:1px solid var(--g6)}
+.wk-avg-t{font-size:10px;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.wk-avg-g{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.avg-c{background:var(--g7);border-radius:var(--rx);padding:9px 6px;text-align:center}
+.avg-v{font-size:15px;font-weight:500}
+.avg-l{font-size:9px;color:var(--g4);margin-top:1px}
+
+/* ── MACRO CHART ── */
+.chart-wrap{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);padding:14px;margin-bottom:12px}
+.chart-ttl{font-size:13px;font-weight:500;margin-bottom:14px}
+.chart-body{display:flex;flex-direction:column;gap:10px}
+.chart-row{display:flex;align-items:center;gap:8px}
+.chart-day{font-size:11px;color:var(--g4);width:24px;flex-shrink:0}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px}
+.chart-bar-bg{height:4px;background:var(--g6);border-radius:999px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:999px}
+.chart-legend{display:flex;gap:12px;margin-top:4px}
+.cl-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--g4)}
+.cl-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── TRACKING SCREEN ── */
+.track-section{margin-bottom:16px}
+.track-card{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);padding:14px;margin-bottom:8px}
+.tc-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.tc-icon{font-size:18px}
+.tc-title{font-size:14px;font-weight:500;flex:1}
+.tc-today{font-size:12px;color:var(--green);font-weight:500}
+.water-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.water-glasses{display:flex;gap:5px;flex-wrap:wrap}
+.wg{width:36px;height:36px;border-radius:var(--rx);border:1.5px solid var(--g5);background:var(--white);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.wg.filled{background:var(--blue-l);border-color:var(--blue)}
+.water-liters{font-size:13px;color:var(--g3);margin-top:4px}
+.sleep-row{display:flex;align-items:center;gap:10px}
+.sleep-val{font-size:28px;font-weight:500}
+.sleep-unit{font-size:13px;color:var(--g4)}
+.sleep-btns{display:flex;gap:6px;margin-left:auto}
+.s-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--g5);background:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.s-btn:active{background:var(--g6)}
+.weight-row{display:flex;align-items:center;gap:10px}
+.weight-val{font-size:28px;font-weight:500}
+.weight-unit{font-size:13px;color:var(--g4)}
+.weight-btns{display:flex;gap:6px;margin-left:auto}
+.weight-hist{margin-top:12px;padding-top:12px;border-top:1px solid var(--g6)}
+.wh-title{font-size:11px;color:var(--g4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em}
+.wh-table{width:100%;font-size:12px;border-collapse:collapse}
+.wh-table td{padding:5px 0;border-bottom:1px solid var(--g6)}
+.wh-table td:last-child{text-align:right;font-weight:500;border-bottom:none}
+.wh-table tr:last-child td{border-bottom:none}
+.wh-diff{font-size:10px;padding:1px 6px;border-radius:999px;margin-left:4px}
+.wh-up{background:#fdecea;color:#c0392b}
+.wh-down{background:var(--green-l);color:var(--green)}
+
+/* ── LOGROS SCREEN ── */
+.logros-hero{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);padding:28px 16px;text-align:center;margin-bottom:12px}
+.streak-fire{font-size:64px;margin-bottom:8px}
+.streak-num{font-family:'Fraunces',serif;font-size:52px;font-weight:300;color:var(--black);line-height:1}
+.streak-lbl{font-size:13px;color:var(--g4);margin-top:4px}
+.streak-sub{font-size:12px;color:var(--g3);margin-top:8px}
+.logros-week{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);padding:14px;margin-bottom:12px}
+.lw-title{font-size:13px;font-weight:500;margin-bottom:12px}
+.lw-days{display:flex;justify-content:space-between}
+.lw-day{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lw-dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--g5);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px}
+.lw-dot.done{background:var(--green);border-color:var(--green);color:var(--white)}
+.lw-dot.today{border-color:var(--black)}
+.lw-lbl{font-size:10px;color:var(--g4)}
+
+/* ── CONFIG SCREEN ── */
+.cfg-card{background:var(--white);border-radius:var(--r);border:1px solid var(--g6);overflow:hidden;margin-bottom:10px}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--g6);cursor:pointer}
+.cfg-row:last-child{border-bottom:none}
+.cfg-row-l{display:flex;align-items:center;gap:10px}
+.cfg-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.cfg-lbl{font-size:14px}
+.cfg-val{font-size:13px;color:var(--g4)}
+.cfg-arr{font-size:14px;color:var(--g5)}
+
+/* ── MODAL ── */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:980;display:none;align-items:flex-end;justify-content:center}
+#modal.show{display:flex}
+.modal-sheet{background:var(--white);border-radius:20px 20px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom,0px)+20px);width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-family:'Fraunces',serif;font-size:19px}
+.modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--g5);background:var(--white);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g3)}
+.form-field{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--g4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--g5);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--black);background:var(--white);outline:none}
+.form-input:focus{border-color:var(--green)}
+.form-submit{width:100%;padding:13px;border-radius:999px;border:none;background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px}
+.form-submit:active{opacity:.85}
+.ing-checklist{max-height:260px;overflow-y:auto;border:1px solid var(--g5);border-radius:var(--rs);margin-bottom:14px}
+.ing-check-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--g6);cursor:pointer}
+.ing-check-row:last-child{border-bottom:none}
+.ing-check-row input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.ing-check-lbl{font-size:13px}
+.menu-option{border:1.5px solid var(--g5);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;cursor:pointer}
+.menu-option.selected{border-color:var(--green);background:var(--green-l)}
+.menu-opt-name{font-size:13px;font-weight:500}
+.menu-opt-macros{font-size:11px;color:var(--g4);margin-top:2px}
+.modal-sub{font-size:12px;color:var(--g4);margin-bottom:10px}
+.reminder-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g6)}
+.reminder-row:last-child{border-bottom:none}
+.reminder-meal{font-size:13px;font-weight:500}
+.reminder-time{font-size:13px;color:var(--green)}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-eyebrow">Tu plan de nutrición</div>
+  <div class="sp-name">Hola, <em>Cinthya</em></div>
+  <div class="sp-week" id="spWeek"></div>
+  <div class="sp-streak">
+    <span class="sp-streak-fire">🔥</span>
+    <span class="sp-streak-txt" id="spStreak"></span>
+  </div>
+  <div class="sp-line"></div>
+  <div class="sp-tip" id="spTip"></div>
+  <button class="sp-btn" onclick="enterApp()">Ver mi plan de hoy</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="h-left">
+      <div class="h-appname">Mi <em>Dieta</em></div>
+      <div class="h-username">Cinthya Gloria Sanai</div>
+    </div>
+    <div class="h-right">
+      <div class="h-day" id="hDay"></div>
+      <div class="h-date" id="hDate"></div>
+      <div class="h-week" id="hWeek"></div>
+    </div>
+  </div>
+  <div class="day-strip" id="dayStrip"></div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <!-- HOY -->
+  <div class="screen active" id="screen-hoy">
+    <div id="dayContent"></div>
+  </div>
+  <!-- SEMANA -->
+  <div class="screen" id="screen-semana">
+    <div class="wk-card">
+      <div class="wk-ttl">Semana completa</div>
+      <table class="wk-table">
+        <thead><tr><th>Día</th><th>Kcal</th><th>Prot</th><th>Carbs</th><th>Grasa</th></tr></thead>
+        <tbody id="wkBody"></tbody>
+      </table>
+      <div class="wk-avg">
+        <div class="wk-avg-t">Promedio diario</div>
+        <div class="wk-avg-g" id="wkAvg"></div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-ttl">Distribución de macros por día</div>
+      <div class="chart-body" id="macroChart"></div>
+      <div class="chart-legend">
+        <div class="cl-item"><div class="cl-dot" style="background:#2d9e75"></div>Proteína</div>
+        <div class="cl-item"><div class="cl-dot" style="background:#f0a832"></div>Carbs</div>
+        <div class="cl-item"><div class="cl-dot" style="background:#e06844"></div>Grasa</div>
+      </div>
+    </div>
+  </div>
+  <!-- SEGUIMIENTO -->
+  <div class="screen" id="screen-seguimiento">
+    <div class="stitle">Agua</div>
+    <div class="track-card">
+      <div class="tc-header">
+        <span class="tc-icon">💧</span>
+        <span class="tc-title">Agua del día</span>
+        <span class="tc-today" id="waterToday">0 vasos · 0.0 L</span>
+      </div>
+      <div class="water-glasses" id="trackGlasses"></div>
+      <div class="water-liters" id="trackLiters">0.0 litros</div>
+    </div>
+    <div class="stitle">Sueño</div>
+    <div class="track-card">
+      <div class="tc-header">
+        <span class="tc-icon">🌙</span>
+        <span class="tc-title">Horas de sueño</span>
+      </div>
+      <div class="sleep-row">
+        <span class="sleep-val" id="sleepVal">7</span>
+        <span class="sleep-unit">horas</span>
+        <div class="sleep-btns">
+          <button class="s-btn" onclick="adjustSleep(-0.5)">−</button>
+          <button class="s-btn" onclick="adjustSleep(0.5)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="stitle">Peso corporal</div>
+    <div class="track-card">
+      <div class="tc-header">
+        <span class="tc-icon">⚖️</span>
+        <span class="tc-title">Peso hoy</span>
+        <button style="font-size:12px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:500" onclick="saveWeight()">Guardar</button>
+      </div>
+      <div class="weight-row">
+        <span class="weight-val" id="weightVal">65.0</span>
+        <span class="weight-unit">kg</span>
+        <div class="weight-btns">
+          <button class="s-btn" onclick="adjustWeight(-0.1)">−</button>
+          <button class="s-btn" onclick="adjustWeight(0.1)">+</button>
+        </div>
+      </div>
+      <div class="weight-hist">
+        <div class="wh-title">Historial</div>
+        <table class="wh-table" id="weightHist"></table>
+      </div>
+    </div>
+  </div>
+  <!-- LOGROS -->
+  <div class="screen" id="screen-logros">
+    <div class="logros-hero">
+      <div class="streak-fire">🔥</div>
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-lbl">días consecutivos</div>
+      <div class="streak-sub" id="streakSub"></div>
+    </div>
+    <div class="logros-week">
+      <div class="lw-title">Esta semana</div>
+      <div class="lw-days" id="lwDays"></div>
+    </div>
+  </div>
+  <!-- CONFIGURACIÓN -->
+  <div class="screen" id="screen-config">
+    <div class="stitle">Semana actual</div>
+    <div class="cfg-card">
+      <div class="cfg-row" onclick="openModal('nueva-semana')">
+        <div class="cfg-row-l">
+          <div class="cfg-icon" style="background:#e8f4ef">📅</div>
+          <span class="cfg-lbl">Nueva semana</span>
+        </div>
+        <span class="cfg-arr">›</span>
+      </div>
+      <div class="cfg-row" onclick="openModal('metas')">
+        <div class="cfg-row-l">
+          <div class="cfg-icon" style="background:#fdf3e3">🎯</div>
+          <span class="cfg-lbl">Metas nutricionales</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="cfg-val" id="cfgMetasVal"></span>
+          <span class="cfg-arr">›</span>
+        </div>
+      </div>
+      <div class="cfg-row" onclick="openModal('ingredientes')">
+        <div class="cfg-row-l">
+          <div class="cfg-icon" style="background:#eaf1fb">🛒</div>
+          <span class="cfg-lbl">Ingredientes disponibles</span>
+        </div>
+        <span class="cfg-arr">›</span>
+      </div>
+    </div>
+    <div class="stitle">Recordatorios</div>
+    <div class="cfg-card">
+      <div class="cfg-row" onclick="openModal('recordatorios')">
+        <div class="cfg-row-l">
+          <div class="cfg-icon" style="background:#fdecea">🔔</div>
+          <span class="cfg-lbl">Horarios de comida</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="cfg-val">7am · 2pm · 8pm</span>
+          <span class="cfg-arr">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="stitle">Reporte semanal</div>
+    <div class="cfg-card">
+      <div class="cfg-row" onclick="sendWeeklyReport()">
+        <div class="cfg-row-l">
+          <div class="cfg-icon" style="background:#e8f4ef">📊</div>
+          <span class="cfg-lbl">Enviar reporte a mi nutri</span>
+        </div>
+        <span class="cfg-arr">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="nb active" id="nav-hoy" onclick="showScreen('hoy')">
+    <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg>Hoy
+  </button>
+  <button class="nb" id="nav-semana" onclick="showScreen('semana')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Semana
+  </button>
+  <button class="nb" id="nav-seguimiento" onclick="showScreen('seguimiento')">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Registro
+  </button>
+  <button class="nb" id="nav-logros" onclick="showScreen('logros')">
+    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Logros
+  </button>
+  <button class="nb" id="nav-config" onclick="showScreen('config')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Config
+  </button>
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-sheet" id="modalContent"></div>
+</div>
+
+<script>
+// ── DATA ──
+const WLBLS=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+const WDATES=[16,17,18,19,20,21,22];
+const DFULL=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const MONTHS=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const TIPS=[
+  "El músculo se construye en la cocina tanto como en el gimnasio.",
+  "Cada comida es una oportunidad de nutrir tu cuerpo con intención.",
+  "Consistencia sobre perfección. Hoy es un buen día.",
+  "Tu cuerpo es el proyecto más importante que tendrás.",
+  "Pequeñas decisiones correctas todos los días hacen grandes resultados.",
+  "La disciplina de hoy es la confianza de mañana.",
+  "Honrar tu plan es honrarte a ti misma."
+];
+
+const ALL_INGREDIENTS=[
+  "Aceite de aguacate","Aderezo ranch sin grasa","Agua","Aguacate","Almendras",
+  "Avena cruda en hojuelas","Bistec de res","Bistec de res sin grasa","Brócoli cocido",
+  "Calabacita italiana","Canela en polvo","Carne molida res 95-5","Cebolla blanca",
+  "Cebolla morada","Chícharos","Creatina mono hidratada","Crema de cacahuate",
+  "Ejotes cocidos","Espárragos cocidos","Espinaca cruda","Fajita de pollo",
+  "Filete de pescado","Frambuesas","Fresas","Galletas Salmas","Iso 100 chocolate",
+  "Iso pure chocolate","Jitomate cherry","Jugo de limón","Leche de almendras",
+  "Leche descremada Lala","Leche Lala sin lactosa","Lechuga","Lechuga romana",
+  "Medallón de atún","Miel","Mora azul","Mora congelada","Mostaza","Omega 3",
+  "Pan de centeno Exequiel","Papa cocida","Papaya","Pasta cocida","Pepino pelado",
+  "Pimiento morrón","Plátano","Pollo pechuga asada","Queso cottage","Queso fresco",
+  "Queso Panela Lala Light","Rice cake","Salmón cocido","Salsa de tomate sin sal",
+  "Salsa verde","Sanissimo tostada","Semillas de chía","Stevia","Tomate rojo",
+  "Tortilla","Vitamina D3","Yogurt griego sin azúcar","Zanahoria"
+];
+
+const P={
+  oatmeal:"https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=700&q=85&fit=crop",
+  protein_shake:"https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=700&q=85&fit=crop",
+  chicken_brocco:"https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=700&q=85&fit=crop",
+  salmon_aspar:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=700&q=85&fit=crop",
+  fish_pasta:"https://images.unsplash.com/photo-1519984388953-d2406bc725e1?w=700&q=85&fit=crop",
+  ground_beef:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=700&q=85&fit=crop",
+  greek_yogurt:"https://images.unsplash.com/photo-1488477181946-6428a0291777?w=700&q=85&fit=crop",
+  chicken_ejotes:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=85&fit=crop",
+  bistec_brocco:"https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&q=85&fit=crop",
+  tuna_salad:"https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=700&q=85&fit=crop",
+  chicken_rice:"https://images.unsplash.com/photo-1604908177453-7462950a8a3b?w=700&q=85&fit=crop",
+  steak_avo:"https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=700&q=85&fit=crop",
+  fish_tortilla:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=700&q=85&fit=crop",
+  pasta_chkn:"https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=700&q=85&fit=crop",
+  tuna_cottage:"https://images.unsplash.com/photo-1534482421-64566f976cfa?w=700&q=85&fit=crop",
+};
+
+const DEFAULT_PLANS=[
+  {tip:TIPS[0],meals:[
+    {name:"Desayuno",plate:"Avena con yogurt y fresas",photo:P.oatmeal,icon:"🌅",items:[
+      {n:"Avena cruda en hojuelas",q:55,u:"g",p:7,c:34,f:3,k:190},
+      {n:"Yogurt griego sin azúcar",q:200,u:"ml",p:20,c:8,f:0,k:112},
+      {n:"Fresas",q:135,u:"g",p:1,c:10,f:0,k:43},
+      {n:"Leche de almendras",q:240,u:"ml",p:1,c:3,f:3,k:40}]},
+    {name:"Comida",plate:"Pollo con brócoli y papa",photo:P.chicken_brocco,icon:"🍽️",items:[
+      {n:"Pollo pechuga asada",q:120,u:"g",p:30,c:0,f:3,k:148},
+      {n:"Brócoli cocido",q:200,u:"g",p:5,c:14,f:0,k:70},
+      {n:"Papa cocida",q:35,u:"g",p:1,c:7,f:0,k:28},
+      {n:"Aceite de aguacate",q:15,u:"ml",p:0,c:0,f:14,k:120}]},
+    {name:"Cena",plate:"Salmón con espárragos",photo:P.salmon_aspar,icon:"🌙",items:[
+      {n:"Salmón cocido",q:120,u:"g",p:25,c:0,f:10,k:196},
+      {n:"Espárragos cocidos",q:135,u:"g",p:4,c:5,f:0,k:33},
+      {n:"Queso cottage",q:150,u:"g",p:17,c:5,f:1,k:97},
+      {n:"Tortilla",q:70,u:"g",p:3,c:35,f:3,k:179}]}
+  ]},
+  {tip:TIPS[1],meals:[
+    {name:"Desayuno",plate:"Shake de proteína con plátano",photo:P.protein_shake,icon:"🌅",items:[
+      {n:"Iso 100 chocolate",q:40,u:"g",p:24,c:5,f:1,k:124},
+      {n:"Leche descremada Lala",q:250,u:"ml",p:9,c:12,f:0,k:87},
+      {n:"Plátano",q:90,u:"g",p:1,c:23,f:0,k:80},
+      {n:"Almendras",q:25,u:"g",p:5,c:4,f:12,k:145}]},
+    {name:"Comida",plate:"Pescado con pasta y espinaca",photo:P.fish_pasta,icon:"🍽️",items:[
+      {n:"Filete de pescado",q:150,u:"g",p:30,c:0,f:4,k:158},
+      {n:"Pasta cocida",q:65,u:"g",p:4,c:20,f:1,k:101},
+      {n:"Espinaca cruda",q:120,u:"g",p:4,c:4,f:0,k:28},
+      {n:"Jitomate cherry",q:45,u:"g",p:1,c:3,f:0,k:16},
+      {n:"Aceite de aguacate",q:10,u:"ml",p:0,c:0,f:9,k:80}]},
+    {name:"Cena",plate:"Carne molida con tortilla",photo:P.ground_beef,icon:"🌙",items:[
+      {n:"Carne molida res 95-5",q:140,u:"g",p:30,c:0,f:8,k:190},
+      {n:"Calabacita italiana",q:110,u:"g",p:2,c:5,f:0,k:20},
+      {n:"Salsa de tomate sin sal",q:65,u:"g",p:1,c:6,f:0,k:27},
+      {n:"Tortilla",q:70,u:"g",p:3,c:35,f:3,k:179}]}
+  ]},
+  {tip:TIPS[2],meals:[
+    {name:"Desayuno",plate:"Avena con mora y yogurt",photo:P.greek_yogurt,icon:"🌅",items:[
+      {n:"Avena cruda en hojuelas",q:55,u:"g",p:7,c:34,f:3,k:190},
+      {n:"Mora congelada",q:80,u:"g",p:1,c:11,f:0,k:45},
+      {n:"Yogurt griego sin azúcar",q:180,u:"ml",p:18,c:7,f:0,k:100},
+      {n:"Semillas de chía",q:5,u:"g",p:1,c:2,f:1,k:24}]},
+    {name:"Comida",plate:"Pollo con ejotes y aguacate",photo:P.chicken_ejotes,icon:"🍽️",items:[
+      {n:"Fajita de pollo",q:120,u:"g",p:28,c:0,f:4,k:148},
+      {n:"Ejotes cocidos",q:130,u:"g",p:3,c:11,f:0,k:46},
+      {n:"Aguacate",q:80,u:"g",p:1,c:4,f:11,k:117},
+      {n:"Pan de centeno Exequiel",q:60,u:"g",p:5,c:28,f:1,k:138}]},
+    {name:"Cena",plate:"Bistec con brócoli y pimiento",photo:P.bistec_brocco,icon:"🌙",items:[
+      {n:"Bistec de res sin grasa",q:150,u:"g",p:35,c:0,f:8,k:215},
+      {n:"Brócoli cocido",q:200,u:"g",p:5,c:14,f:0,k:70},
+      {n:"Pimiento morrón",q:75,u:"g",p:1,c:5,f:0,k:23},
+      {n:"Queso Panela Lala Light",q:30,u:"g",p:6,c:1,f:3,k:53}]}
+  ]},
+  {tip:TIPS[3],meals:[
+    {name:"Desayuno",plate:"Shake con frambuesas",photo:P.protein_shake,icon:"🌅",items:[
+      {n:"Iso 100 chocolate",q:40,u:"g",p:24,c:5,f:1,k:124},
+      {n:"Leche Lala sin lactosa",q:250,u:"ml",p:9,c:12,f:2,k:100},
+      {n:"Frambuesas",q:35,u:"g",p:1,c:5,f:0,k:22},
+      {n:"Galletas Salmas",q:30,u:"g",p:1,c:16,f:2,k:85}]},
+    {name:"Comida",plate:"Ensalada de atún",photo:P.tuna_salad,icon:"🍽️",items:[
+      {n:"Medallón de atún",q:150,u:"g",p:33,c:0,f:2,k:151},
+      {n:"Lechuga romana",q:90,u:"g",p:2,c:3,f:0,k:18},
+      {n:"Pepino pelado",q:180,u:"g",p:1,c:4,f:0,k:23},
+      {n:"Aderezo ranch sin grasa",q:30,u:"g",p:1,c:4,f:1,k:28},
+      {n:"Queso fresco",q:40,u:"g",p:6,c:1,f:7,k:88}]},
+    {name:"Cena",plate:"Pollo con chícharos",photo:P.chicken_rice,icon:"🌙",items:[
+      {n:"Pollo pechuga asada",q:120,u:"g",p:30,c:0,f:3,k:148},
+      {n:"Chícharos",q:40,u:"g",p:3,c:10,f:0,k:50},
+      {n:"Zanahoria",q:20,u:"g",p:0,c:2,f:0,k:8},
+      {n:"Salsa verde",q:50,u:"g",p:0,c:4,f:0,k:18},
+      {n:"Rice cake",q:20,u:"g",p:1,c:15,f:0,k:66}]}
+  ]},
+  {tip:TIPS[4],meals:[
+    {name:"Desayuno",plate:"Yogurt con mora y avena",photo:P.greek_yogurt,icon:"🌅",items:[
+      {n:"Yogurt griego sin azúcar",q:200,u:"ml",p:20,c:8,f:0,k:112},
+      {n:"Mora azul",q:40,u:"g",p:1,c:6,f:0,k:23},
+      {n:"Avena cruda en hojuelas",q:55,u:"g",p:7,c:34,f:3,k:190},
+      {n:"Miel",q:15,u:"g",p:0,c:13,f:0,k:46}]},
+    {name:"Comida",plate:"Salmón con espinaca y pan",photo:P.salmon_aspar,icon:"🍽️",items:[
+      {n:"Salmón cocido",q:120,u:"g",p:25,c:0,f:10,k:196},
+      {n:"Espinaca cruda",q:120,u:"g",p:4,c:4,f:0,k:28},
+      {n:"Tomate rojo",q:100,u:"g",p:1,c:4,f:0,k:20},
+      {n:"Aceite de aguacate",q:10,u:"ml",p:0,c:0,f:9,k:80},
+      {n:"Pan de centeno Exequiel",q:60,u:"g",p:5,c:28,f:1,k:138}]},
+    {name:"Cena",plate:"Carne con pimiento y tostada",photo:P.ground_beef,icon:"🌙",items:[
+      {n:"Carne molida res 95-5",q:140,u:"g",p:30,c:0,f:8,k:190},
+      {n:"Pimiento morrón",q:90,u:"g",p:1,c:6,f:0,k:28},
+      {n:"Queso cottage",q:125,u:"g",p:14,c:4,f:1,k:81},
+      {n:"Sanissimo tostada",q:25,u:"g",p:1,c:16,f:1,k:76}]}
+  ]},
+  {tip:TIPS[5],meals:[
+    {name:"Desayuno",plate:"Shake con papaya y almendras",photo:P.protein_shake,icon:"🌅",items:[
+      {n:"Iso pure chocolate",q:25,u:"g",p:25,c:3,f:1,k:120},
+      {n:"Leche de almendras",q:240,u:"ml",p:1,c:3,f:3,k:40},
+      {n:"Papaya",q:75,u:"g",p:1,c:10,f:0,k:30},
+      {n:"Almendras",q:25,u:"g",p:5,c:4,f:12,k:145}]},
+    {name:"Comida",plate:"Bistec con aguacate",photo:P.steak_avo,icon:"🍽️",items:[
+      {n:"Bistec de res",q:150,u:"g",p:30,c:0,f:12,k:231},
+      {n:"Aguacate",q:130,u:"g",p:2,c:7,f:18,k:195},
+      {n:"Lechuga",q:135,u:"g",p:2,c:4,f:0,k:25},
+      {n:"Jitomate cherry",q:45,u:"g",p:1,c:3,f:0,k:16},
+      {n:"Mostaza",q:10,u:"g",p:0,c:0,f:0,k:6}]},
+    {name:"Cena",plate:"Pescado con brócoli",photo:P.fish_tortilla,icon:"🌙",items:[
+      {n:"Filete de pescado",q:150,u:"g",p:30,c:0,f:4,k:158},
+      {n:"Brócoli cocido",q:200,u:"g",p:5,c:14,f:0,k:70},
+      {n:"Cebolla blanca",q:35,u:"g",p:0,c:3,f:0,k:14},
+      {n:"Salsa de tomate sin sal",q:65,u:"g",p:1,c:6,f:0,k:27},
+      {n:"Tortilla",q:70,u:"g",p:3,c:35,f:3,k:179}]}
+  ]},
+  {tip:TIPS[6],meals:[
+    {name:"Desayuno",plate:"Avena con fresas y cacahuate",photo:P.oatmeal,icon:"🌅",items:[
+      {n:"Avena cruda en hojuelas",q:55,u:"g",p:7,c:34,f:3,k:190},
+      {n:"Leche descremada Lala",q:250,u:"ml",p:9,c:12,f:0,k:87},
+      {n:"Fresas",q:135,u:"g",p:1,c:10,f:0,k:43},
+      {n:"Crema de cacahuate",q:10,u:"ml",p:2,c:3,f:8,k:94}]},
+    {name:"Comida",plate:"Pollo con pasta y espárragos",photo:P.pasta_chkn,icon:"🍽️",items:[
+      {n:"Fajita de pollo",q:120,u:"g",p:28,c:0,f:4,k:148},
+      {n:"Pasta cocida",q:65,u:"g",p:4,c:20,f:1,k:101},
+      {n:"Espárragos cocidos",q:135,u:"g",p:4,c:5,f:0,k:33},
+      {n:"Pimiento morrón",q:75,u:"g",p:1,c:5,f:0,k:23},
+      {n:"Aceite de aguacate",q:10,u:"ml",p:0,c:0,f:9,k:80}]},
+    {name:"Cena",plate:"Atún con cottage y aguacate",photo:P.tuna_cottage,icon:"🌙",items:[
+      {n:"Medallón de atún",q:150,u:"g",p:33,c:0,f:2,k:151},
+      {n:"Queso cottage",q:150,u:"g",p:17,c:5,f:1,k:97},
+      {n:"Pepino pelado",q:180,u:"g",p:1,c:4,f:0,k:23},
+      {n:"Galletas Salmas",q:30,u:"g",p:1,c:16,f:2,k:85},
+      {n:"Aguacate",q:80,u:"g",p:1,c:4,f:11,k:117}]}
+  ]}
+];
+
+// ── STATE ──
+function loadState(){
+  try{return JSON.parse(localStorage.getItem('dietaState')||'null')}catch(e){return null}
+}
+function saveState(){
+  try{localStorage.setItem('dietaState',JSON.stringify(state))}catch(e){}
+}
+
+const defaultState={
+  plans:JSON.parse(JSON.stringify(DEFAULT_PLANS)),
+  metas:{kcal:2100,prot:155,carbs:230,grasa:60},
+  streak:0,
+  weekDone:[false,false,false,false,false,false,false],
+  water:{glasses:0,date:''},
+  sleep:7,
+  weight:65.0,
+  weightHistory:[],
+  selectedIngredients:ALL_INGREDIENTS.slice(0,30)
+};
+let state=loadState()||JSON.parse(JSON.stringify(defaultState));
+
+let selDay=(new Date().getDay()+6)%7;
+let ingOpen=false;
+const now=new Date();
+
+// ── SPLASH ──
+document.getElementById('spWeek').textContent='Semana 16–22 de marzo';
+document.getElementById('spStreak').textContent=state.streak+' días de racha';
+document.getElementById('spTip').textContent='"'+state.plans[selDay].tip+'"';
+
+function enterApp(){
+  document.getElementById('splash').classList.add('hidden');
+  
+}
+
+// ── HEADER ──
+document.getElementById('hDay').textContent=DFULL[now.getDay()];
+document.getElementById('hDate').textContent=now.getDate()+' de '+MONTHS[now.getMonth()];
+document.getElementById('hWeek').textContent='Semana 16–22 mar';
+
+// ── DAY STRIP ──
+function buildStrip(){
+  const s=document.getElementById('dayStrip');
+  s.innerHTML=WLBLS.map((d,i)=>`<button class="day-btn${i===selDay?' active':''}" onclick="selDay=${i};buildStrip();renderDay()">\
+<span class="dn">${d}</span><span class="dd">${WDATES[i]}</span></button>`).join('');
+  setTimeout(()=>{const b=s.children[selDay];b&&b.scrollIntoView({inline:'center',behavior:'smooth'})},60);
+}
+
+// ── TOTALS ──
+function totals(day){
+  let p=0,c=0,f=0,k=0;
+  day.meals.forEach(m=>m.items.forEach(i=>{p+=i.p;c+=i.c;f+=i.f;k+=i.k}));
+  return{p,c,f,k};
+}
+function allIng(day){
+  const m={};
+  day.meals.forEach(ml=>ml.items.forEach(i=>{if(!m[i.n])m[i.n]=i.q+' '+i.u}));
+  return Object.entries(m);
+}
+
+// ── WARN CHECK ──
+function warnMacros(t){
+  const m=state.metas;
+  const diffK=Math.abs(t.k-m.kcal)/m.kcal;
+  const diffP=Math.abs(t.p-m.prot)/m.prot;
+  return(diffK>0.15||diffP>0.2)?'⚠️':'';
+}
+
+// ── RENDER DAY ──
+function renderDay(){
+  const day=state.plans[selDay];
+  const t=totals(day);
+  const tot=t.p+t.c+t.f||1;
+  const pp=Math.round(t.p/tot*100),cp=Math.round(t.c/tot*100),fp=100-pp-cp;
+  const ings=allIng(day);
+  const warn=warnMacros(t);
+  ingOpen=false;
+
+  document.getElementById('dayContent').innerHTML=`
+    <div class="macro-hero">
+      <div class="mh-top">
+        <div>
+          <div class="mh-label">Plan del día</div>
+          <div class="mh-day">${WLBLS[selDay]} ${WDATES[selDay]} marzo</div>
+        </div>
+        <span class="mh-warn">${warn}</span>
+      </div>
+      <div class="mh-grid">
+        <div class="mh-cell"><div class="mh-val">${Math.round(t.k)}</div><div class="mh-lbl">kcal</div></div>
+        <div class="mh-cell"><div class="mh-val">${Math.round(t.p)}g</div><div class="mh-lbl">proteína</div></div>
+        <div class="mh-cell"><div class="mh-val">${Math.round(t.c)}g</div><div class="mh-lbl">carbs</div></div>
+        <div class="mh-cell"><div class="mh-val">${Math.round(t.f)}g</div><div class="mh-lbl">grasa</div></div>
+      </div>
+      <div class="mh-track">
+        <div class="tr-p" style="width:${pp}%"></div>
+        <div class="tr-c" style="width:${cp}%"></div>
+        <div class="tr-f" style="width:${fp}%"></div>
+      </div>
+    </div>
+
+    <div class="vitals-bar">
+      <div class="vb-card">
+        <div class="vb-icon-row"><span class="vb-icon">💧</span><span class="vb-edit" onclick="showScreen('seguimiento')">editar</span></div>
+        <div class="vb-val" id="vitalsWater">${state.water.glasses}</div>
+        <div class="vb-lbl">vasos</div>
+      </div>
+      <div class="vb-card">
+        <div class="vb-icon-row"><span class="vb-icon">🌙</span><span class="vb-edit" onclick="showScreen('seguimiento')">editar</span></div>
+        <div class="vb-val" id="vitalsSleep">${state.sleep}</div>
+        <div class="vb-lbl">horas sueño</div>
+      </div>
+      <div class="vb-card">
+        <div class="vb-icon-row"><span class="vb-icon">⚖️</span><span class="vb-edit" onclick="showScreen('seguimiento')">editar</span></div>
+        <div class="vb-val" id="vitalsWeight">${state.weight.toFixed(1)}</div>
+        <div class="vb-lbl">kg</div>
+      </div>
+    </div>
+
+    <div class="stitle">Ingredientes del día</div>
+    <div class="ing-card">
+      <div class="ing-hdr" onclick="toggleIng()">
+        <div class="ing-hdr-l">
+          <div class="ing-ico">🛒</div>
+          <div><div class="ing-ttl">Lo que necesitas hoy</div><div class="ing-sub">${ings.length} ingredientes</div></div>
+        </div>
+        <span class="ing-arr" id="ingArr">▾</span>
+      </div>
+      <div class="ing-body" id="ingBody">
+        <div class="ing-inner">${ings.map(([n,q])=>`<div class="ing-row"><span class="ing-n">${n}</span><span class="ing-q">${q}</span></div>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="stitle">Comidas del día</div>
+    ${day.meals.map((m,mi)=>{
+      let mp=0,mc=0,mf=0,mk=0;
+      m.items.forEach(i=>{mp+=i.p;mc+=i.c;mf+=i.f;mk+=i.k});
+      return`<div class="meal-card">
+        <div class="meal-photo-wrap">
+          <img class="meal-photo" src="${m.photo}" alt="${m.plate}" loading="lazy"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="meal-fallback">${m.icon}</div>
+          <div class="meal-badge">${m.icon} ${m.name}</div>
+          <div class="meal-kcal-tag">${Math.round(mk)} kcal</div>
+        </div>
+        <div class="meal-pname">${m.plate}</div>
+        <div class="meal-items">${m.items.map((item,ii)=>`<div class="food-row">
+          <div class="food-l">
+            <div class="food-n">${item.n}</div>
+            <div class="food-m">${item.p}g prot · ${item.c}g carbs · ${item.f}g grasa</div>
+          </div>
+          <div class="food-r">
+            <div class="qty-ctrl">
+              <button class="qty-btn" onclick="adjustQty(${selDay},${mi},${ii},-5)">−</button>
+              <span class="qty-val" id="qty-${selDay}-${mi}-${ii}">${item.q} ${item.u}</span>
+              <button class="qty-btn" onclick="adjustQty(${selDay},${mi},${ii},5)">+</button>
+            </div>
+          </div>
+        </div>`).join('')}</div>
+        <div class="meal-foot">
+          <div class="mfp"><div class="mfv">${Math.round(mp)}g</div><div class="mfl">Proteína</div></div>
+          <div class="mfp"><div class="mfv">${Math.round(mc)}g</div><div class="mfl">Carbs</div></div>
+          <div class="mfp"><div class="mfv">${Math.round(mf)}g</div><div class="mfl">Grasa</div></div>
+        </div>
+      </div>`;
+    }).join('')}
+
+    <button class="share-btn" onclick="shareDayWhatsApp()">
+      <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      Compartir con mi nutri por WhatsApp
+    </button>`;
+}
+
+// ── QTY ADJUST ──
+function adjustQty(di,mi,ii,delta){
+  const item=state.plans[di].meals[mi].items[ii];
+  item.q=Math.max(5,item.q+delta);
+  const el=document.getElementById(`qty-${di}-${mi}-${ii}`);
+  if(el)el.textContent=item.q+' '+item.u;
+  saveState();
+  // refresh hero
+  const day=state.plans[selDay];
+  const t=totals(day);
+  const tot=t.p+t.c+t.f||1;
+  const pp=Math.round(t.p/tot*100),cp=Math.round(t.c/tot*100),fp=100-pp-cp;
+  const warn=warnMacros(t);
+  const hero=document.querySelector('.macro-hero');
+  if(hero){
+    hero.querySelector('.mh-warn').textContent=warn;
+    const cells=hero.querySelectorAll('.mh-val');
+    cells[0].textContent=Math.round(t.k);
+    cells[1].textContent=Math.round(t.p)+'g';
+    cells[2].textContent=Math.round(t.c)+'g';
+    cells[3].textContent=Math.round(t.f)+'g';
+    const track=hero.querySelector('.mh-track');
+    track.children[0].style.width=pp+'%';
+    track.children[1].style.width=cp+'%';
+    track.children[2].style.width=fp+'%';
+  }
+}
+
+// ── ING TOGGLE ──
+function toggleIng(){
+  ingOpen=!ingOpen;
+  document.getElementById('ingBody').classList.toggle('open',ingOpen);
+  document.getElementById('ingArr').textContent=ingOpen?'▴':'▾';
+}
+
+// ── WATER ──
+function renderTrackingWater(){
+  const tg=document.getElementById('trackGlasses');
+  const tl=document.getElementById('trackLiters');
+  const tw=document.getElementById('waterToday');
+  if(!tg)return;
+  const g=state.water.glasses||0;
+  tg.innerHTML=Array.from({length:8},(_,i)=>`<div class="wg${i<g?' filled':''}" onclick="setTrackGlass(${i+1})">🥛</div>`).join('');
+  if(tl)tl.textContent=(g*0.25).toFixed(2)+' litros';
+  if(tw)tw.textContent=g+' vasos · '+(g*0.25).toFixed(1)+' L';
+}
+function setTrackGlass(n){
+  state.water.glasses=n;saveState();
+  renderTrackingWater();updateVitals();
+}
+function adjustSleep(d){
+  state.sleep=Math.max(0,Math.min(12,+(state.sleep+d).toFixed(1)));
+  const el=document.getElementById('sleepVal');
+  if(el)el.textContent=state.sleep;
+  saveState();updateVitals();
+}
+function adjustWeight(d){
+  state.weight=Math.max(30,Math.min(200,+(state.weight+d).toFixed(1)));
+  const el=document.getElementById('weightVal');
+  if(el)el.textContent=state.weight.toFixed(1);
+  saveState();updateVitals();
+}
+function saveWeight(){
+  const entry={date:now.getDate()+' '+MONTHS[now.getMonth()],kg:state.weight};
+  state.weightHistory=state.weightHistory.filter(e=>e.date!==entry.date);
+  state.weightHistory.unshift(entry);
+  if(state.weightHistory.length>10)state.weightHistory.pop();
+  saveState();renderWeightHist();
+}
+function renderWeightHist(){
+  const t=document.getElementById('weightHist');
+  if(!t)return;
+  if(!state.weightHistory.length){t.innerHTML='<tr><td style="color:var(--g4);font-size:12px" colspan="2">Sin registros aún</td></tr>';return}
+  t.innerHTML=state.weightHistory.map((e,i)=>{
+    const prev=state.weightHistory[i+1];
+    let diff='';
+    if(prev){const d=(e.kg-prev.kg).toFixed(1);diff=`<span class="wh-diff ${d>0?'wh-up':'wh-down'}">${d>0?'+':''}${d}</span>`}
+    return`<tr><td style="color:var(--g4)">${e.date}</td><td>${e.kg.toFixed(1)} kg${diff}</td></tr>`;
+  }).join('');
+}
+
+// ── LOGROS ──
+function renderLogros(){
+  document.getElementById('streakNum').textContent=state.streak;
+  document.getElementById('streakSub').textContent=state.streak>0?'¡Sigue así, vas muy bien!':'¡Empieza hoy tu racha!';
+  const lw=document.getElementById('lwDays');
+  lw.innerHTML=WLBLS.map((d,i)=>`<div class="lw-day">
+    <div class="lw-dot${state.weekDone[i]?' done':''}${i===selDay?' today':''}">${state.weekDone[i]?'✓':''}</div>
+    <div class="lw-lbl">${d}</div>
+  </div>`).join('');
+}
+
+// ── WEEKLY ──
+function buildWeekTable(){
+  let tp=0,tc=0,tf=0,tk=0;
+  const m=state.metas;
+  document.getElementById('wkBody').innerHTML=state.plans.map((day,i)=>{
+    const t=totals(day);tp+=t.p;tc+=t.c;tf+=t.f;tk+=t.k;
+    const warn=warnMacros(t)?'⚠️':'';
+    return`<tr class="${i===selDay?'tr-today':''}"><td>${WLBLS[i]} ${WDATES[i]}${warn}</td><td>${Math.round(t.k)}</td><td>${Math.round(t.p)}g</td><td>${Math.round(t.c)}g</td><td>${Math.round(t.f)}g</td></tr>`;
+  }).join('');
+  const n=state.plans.length;
+  document.getElementById('wkAvg').innerHTML=`
+    <div class="avg-c"><div class="avg-v">${Math.round(tk/n)}</div><div class="avg-l">Kcal</div></div>
+    <div class="avg-c"><div class="avg-v">${Math.round(tp/n)}g</div><div class="avg-l">Prot</div></div>
+    <div class="avg-c"><div class="avg-v">${Math.round(tc/n)}g</div><div class="avg-l">Carbs</div></div>
+    <div class="avg-c"><div class="avg-v">${Math.round(tf/n)}g</div><div class="avg-l">Grasa</div></div>`;
+  buildMacroChart();
+}
+function buildMacroChart(){
+  const maxK=Math.max(...state.plans.map(d=>totals(d).k))||1;
+  document.getElementById('macroChart').innerHTML=state.plans.map((day,i)=>{
+    const t=totals(day);
+    const tot=t.p+t.c+t.f||1;
+    return`<div class="chart-row">
+      <span class="chart-day">${WLBLS[i]}</span>
+      <div class="chart-bar-wrap">
+        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(t.p/tot*100)}%;background:#2d9e75"></div></div>
+        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(t.c/tot*100)}%;background:#f0a832"></div></div>
+        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round(t.f/tot*100)}%;background:#e06844"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SCREENS ──
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='semana')buildWeekTable();
+  if(name==='seguimiento'){renderTrackingWater();renderWeightHist();document.getElementById('sleepVal').textContent=state.sleep;document.getElementById('weightVal').textContent=state.weight.toFixed(1);}
+  if(name==='logros')renderLogros();
+  if(name==='config')document.getElementById('cfgMetasVal').textContent=state.metas.kcal+' kcal';
+}
+
+// ── MODALS ──
+function openModal(type){
+  const mc=document.getElementById('modalContent');
+  if(type==='metas'){
+    mc.innerHTML=`<div class="modal-header"><div class="modal-title">Metas nutricionales</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-sub">Ingresa las metas que te indicó tu nutriólogo</div>
+    <div class="form-field"><div class="form-label">Calorías diarias (kcal)</div><input class="form-input" type="number" id="m-kcal" value="${state.metas.kcal}"></div>
+    <div class="form-field"><div class="form-label">Proteína (g)</div><input class="form-input" type="number" id="m-prot" value="${state.metas.prot}"></div>
+    <div class="form-field"><div class="form-label">Carbohidratos (g)</div><input class="form-input" type="number" id="m-carbs" value="${state.metas.carbs}"></div>
+    <div class="form-field"><div class="form-label">Grasa (g)</div><input class="form-input" type="number" id="m-grasa" value="${state.metas.grasa}"></div>
+    <button class="form-submit" onclick="saveMetas()">Guardar metas</button>`;
+  }else if(type==='recordatorios'){
+    mc.innerHTML=`<div class="modal-header"><div class="modal-title">Recordatorios</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-sub">Horarios actuales para notificaciones</div>
+    <div class="reminder-row"><span class="reminder-meal">🌅 Desayuno</span><span class="reminder-time">7:00 AM</span></div>
+    <div class="reminder-row"><span class="reminder-meal">🍽️ Comida</span><span class="reminder-time">2:00 PM</span></div>
+    <div class="reminder-row"><span class="reminder-meal">🌙 Cena</span><span class="reminder-time">8:00 PM</span></div>
+    <div style="margin-top:16px;padding:12px;background:var(--g7);border-radius:var(--rs);font-size:12px;color:var(--g3)">Las notificaciones push requieren agregar la app a tu pantalla de inicio en Safari.</div>`;
+  }else if(type==='ingredientes'){
+    mc.innerHTML=`<div class="modal-header"><div class="modal-title">Ingredientes disponibles</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-sub">Marca lo que tienes en casa esta semana</div>
+    <div class="ing-checklist">${ALL_INGREDIENTS.map(ing=>`<div class="ing-check-row">
+      <input type="checkbox" ${state.selectedIngredients.includes(ing)?'checked':''} onchange="toggleIng2('${ing}',this.checked)">
+      <span class="ing-check-lbl">${ing}</span>
+    </div>`).join('')}</div>
+    <button class="form-submit" onclick="closeModal()">Listo</button>`;
+  }else if(type==='nueva-semana'){
+    mc.innerHTML=`<div class="modal-header"><div class="modal-title">Nueva semana</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-sub">Configura tus metas y el menú para la próxima semana</div>
+    <div class="form-field"><div class="form-label">Calorías diarias (kcal)</div><input class="form-input" type="number" id="ns-kcal" value="${state.metas.kcal}"></div>
+    <div class="form-field"><div class="form-label">Proteína (g)</div><input class="form-input" type="number" id="ns-prot" value="${state.metas.prot}"></div>
+    <div class="form-field"><div class="form-label">Carbohidratos (g)</div><input class="form-input" type="number" id="ns-carbs" value="${state.metas.carbs}"></div>
+    <div class="form-field"><div class="form-label">Grasa (g)</div><input class="form-input" type="number" id="ns-grasa" value="${state.metas.grasa}"></div>
+    <div style="margin:14px 0 8px;font-size:12px;font-weight:500;color:var(--g3);text-transform:uppercase;letter-spacing:.07em">Reiniciar registros semanales</div>
+    <button class="form-submit" onclick="startNewWeek()" style="background:var(--green)">Iniciar nueva semana</button>`;
+  }
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function saveMetas(){
+  state.metas={
+    kcal:+document.getElementById('m-kcal').value||2100,
+    prot:+document.getElementById('m-prot').value||155,
+    carbs:+document.getElementById('m-carbs').value||230,
+    grasa:+document.getElementById('m-grasa').value||60
+  };
+  saveState();closeModal();
+  document.getElementById('cfgMetasVal').textContent=state.metas.kcal+' kcal';
+}
+function toggleIng2(ing,checked){
+  if(checked)state.selectedIngredients.push(ing);
+  else state.selectedIngredients=state.selectedIngredients.filter(i=>i!==ing);
+  saveState();
+}
+function startNewWeek(){
+  state.metas={
+    kcal:+document.getElementById('ns-kcal').value||2100,
+    prot:+document.getElementById('ns-prot').value||155,
+    carbs:+document.getElementById('ns-carbs').value||230,
+    grasa:+document.getElementById('ns-grasa').value||60
+  };
+  state.weekDone=[false,false,false,false,false,false,false];
+  state.water={glasses:0,date:''};
+  saveState();closeModal();
+  renderDay();
+  alert('¡Nueva semana iniciada! 💪');
+}
+
+// ── SHARE ──
+function shareDayWhatsApp(){
+  const day=state.plans[selDay];
+  const t=totals(day);
+  let msg=`📊 Mi plan del ${WLBLS[selDay]} ${WDATES[selDay]} de marzo:\n\n`;
+  day.meals.forEach(m=>{
+    msg+=`${m.icon} *${m.name}* — ${m.plate}\n`;
+    m.items.forEach(i=>{ msg+=`  • ${i.n}: ${i.q} ${i.u}\n`; });
+    msg+='\n';
+  });
+  msg+=`📈 Totales: ${Math.round(t.k)} kcal | ${Math.round(t.p)}g prot | ${Math.round(t.c)}g carbs | ${Math.round(t.f)}g grasa`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function sendWeeklyReport(){
+  let msg='📊 *Reporte semanal — Cinthya*\n16–22 de marzo\n\n';
+  state.plans.forEach((day,i)=>{
+    const t=totals(day);
+    msg+=`*${WLBLS[i]} ${WDATES[i]}*\n`;
+    day.meals.forEach(m=>{
+      msg+=`${m.icon} ${m.name}: ${m.plate}\n`;
+      m.items.forEach(it=>{ msg+=`  • ${it.n}: ${it.q} ${it.u}\n`; });
+    });
+    msg+=`Totales: ${Math.round(t.k)} kcal | ${Math.round(t.p)}g prot | ${Math.round(t.c)}g carbs | ${Math.round(t.f)}g grasa\n\n`;
+  });
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ── INIT ──
+buildStrip();
+renderDay();
+document.getElementById('cfgMetasVal').textContent=state.metas.kcal+' kcal';
+</script>
+</body>
+</html>
