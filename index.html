@@ -507,7 +507,24 @@ const TIPS=[
   "Tu cuerpo es el proyecto más importante que tendrás.",
   "Pequeñas decisiones correctas todos los días hacen grandes resultados.",
   "La disciplina de hoy es la confianza de mañana.",
-  "Honrar tu plan es honrarte a ti misma."
+  "Honrar tu plan es honrarte a ti misma.",
+  "No se trata de motivación, se trata de hábito.",
+  "Lo que comes en privado se ve en público.",
+  "Cada día que sigues tu plan es una victoria.",
+  "Tu futuro yo te lo agradecerá.",
+  "El progreso no es lineal, pero sí acumulativo.",
+  "Come bien, muévete, descansa. Repite.",
+  "La fuerza no viene del gimnasio, viene de la cocina.",
+  "Hoy es otro día para ser mejor que ayer.",
+  "El único mal entrenamiento es el que no hiciste.",
+  "Cuida tu cuerpo, es el único lugar donde tienes que vivir.",
+  "Pequeños pasos todos los días llevan muy lejos.",
+  "La paciencia con el proceso es parte del proceso.",
+  "No busques la perfección, busca la constancia.",
+  "Tu energía de hoy depende de lo que comes hoy.",
+  "Alimentarse bien es un acto de amor propio.",
+  "El descanso también es parte del entrenamiento.",
+  "Haz del autocuidado una prioridad, no una excusa."
 ];
 
 const ALL_INGREDIENTS=[
@@ -726,7 +743,7 @@ const now=new Date();
 // ── SPLASH ──
 document.getElementById('spWeek').textContent='Semana '+weekLabel();
 document.getElementById('spStreak').textContent=state.streak+' días de racha';
-document.getElementById('spTip').textContent='"'+state.plans[selDay].tip+'"';
+document.getElementById('spTip').textContent='"'+TIPS[Math.floor(Math.random()*TIPS.length)]+'"';
 
 function enterApp(){
   document.getElementById('splash').classList.add('hidden');
